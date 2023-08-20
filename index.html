@@ -38,7 +38,7 @@
             app.stage.addChild(img);
         }
         
-        JootM2.init("http://linxing-test.oss-cn-chengdu.aliyuncs.com/mir2/resources.json")
+        JootM2.init("http://localhost:55842/resources.json")
         JootM2.Image.onTextureLoad((libName, no, tex) => {
             if (tex.isEmpty) return;
             const pixiTex = PIXI.Texture.fromBuffer(tex.pixels, tex.width, tex.height);
