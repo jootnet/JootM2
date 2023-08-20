@@ -18,4 +18,4 @@ npm run build
 Just double click ***index.html*** to open it
 
 > [!WARNING]
-> The resource files used in the project are all from the Internet. If there is any infringement, please contact me to delete it.
+> The resource files used in the project are all from the Internet and are only used for learning purposes. If there is any infringement, please contact me to delete
