@@ -24,4 +24,4 @@ Just double click ***index.html*** to open it
 <br/>
 <br/>
 > [!WARNING]
-> The resource files used in the project are all from the Internet and are only used for learning purposes. If there is any infringement, please contact me to delete
+> The resource files used in the project are all from the Internet and are only used for learning purposes, please do not use it for other purposes. If there is any infringement, please contact me to delete
