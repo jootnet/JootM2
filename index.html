@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>JootM2</title>
+    <script src="https://pixijs.download/release/pixi.js"></script>
+    <script src="dist/JootM2.js"></script>
+</head>
+
+<body>
+    <input type="text" value="chrsel" name="libName"/>
+    <br />
+    <input type="number" value="0" name="startNo"/> <button name="btnShow">load</button>
+    <br/>
+    <select type="select" name="selectTextures"></select>
+    <br>
+    <script>
+        const app = new PIXI.Application({ background: '#000', width: 1024, height: 768 });
+        document.body.appendChild(app.view);
+
+        const selectTextures = document.querySelector("select[name='selectTextures']");
+        const btnShow = document.querySelector("button[name='btnShow']");
+
+        btnShow.onclick = (event) => {
+            JootM2.Image.load(document.querySelector("input[name='libName']").value, parseInt(document.querySelector("input[name='startNo']").value))
+        }
+        selectTextures.onchange = (event) => {
+            const selOpts = event.target.selectedOptions;
+            const img = new PIXI.Sprite(PIXI.Texture.from(selOpts[0].text));
+            // center the sprite's anchor point
+            img.anchor.set(0.5);
+
+            // move the sprite to the center of the screen
+            img.x = app.screen.width / 2;
+            img.y = app.screen.height / 2;
+
+            app.stage.removeChildren(0);
+            app.stage.addChild(img);
+        }
+        
+        JootM2.init("http://linxing-test.oss-cn-chengdu.aliyuncs.com/mir2/resources.json")
+        JootM2.Image.onTextureLoad((libName, no, tex) => {
+            if (tex.isEmpty) return;
+            const pixiTex = PIXI.Texture.fromBuffer(tex.pixels, tex.width, tex.height);
+            if (pixiTex) {
+                PIXI.Texture.addToCache(pixiTex, `${libName}/${no}`);
+                const opt = document.createElement("option");
+                opt.value = pixiTex;
+                opt.text = `${libName}/${no}`;
+                const firstFlag = selectTextures.selectedIndex == -1;
+                selectTextures.add(opt, null);
+                if (firstFlag) {
+                    var event = new Event("change");
+                    selectTextures.dispatchEvent(event);
+                }
+            }
+        });
+</script>
+</body>
