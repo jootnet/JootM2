@@ -17,5 +17,5 @@ npm run build
 ## How To Run
 Just double click ***index.html*** to open it
 
-## Affirm
-The resource files used in the project are all from the Internet. If there is any infringement, please contact me to delete it.
+> [!WARNING]
+> The resource files used in the project are all from the Internet. If there is any infringement, please contact me to delete it.
