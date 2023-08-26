@@ -1,11 +1,12 @@
 import { WIL } from "./WIL.js"
+import * as PIXI from "pixi.js"
 
 // 图片库的地址，每个图片库都有两个地址，wix/wzx和wil/wzl
 const libUrls = new Map
 // 图片加载器，每一个图片库对应一个，可能是WIL，也可能是WZL
 const loaders = new Map
 // 当异步加载图片成功时的回调函数（每幅图片都会回调一次）
-let textureConsumer = null;
+let textureConsumer = null
 // 图片加载的类
 class Images {
 
@@ -35,6 +36,10 @@ class Images {
             if (indexFileUrl.toLowerCase().endsWith("wix")) {
                 const wil = new WIL(indexFileUrl, libraryFileUrl)
                 wil.onTextureLoad((no, tex) => {
+                    const pixiTex = PIXI.BaseTexture.fromBuffer(tex.pixels, tex.width, tex.height);
+                    if (pixiTex) {
+                        PIXI.utils.BaseTextureCache[`${libName}/${no}`] = pixiTex
+                    }
                     if (textureConsumer != null) {
                         textureConsumer(libName, no, tex)
                     }

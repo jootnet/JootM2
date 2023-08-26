@@ -1,5 +1,6 @@
 import { Images } from "./image/Images.js"
 import { Maps } from "./map/Maps.js"
+import { MapActor } from "./actor/MapActor.js"
 
 async function init(resourcesJsonUrl) {
     try {
@@ -26,4 +27,4 @@ async function init(resourcesJsonUrl) {
     }
 }
 
-export { init, Images as Image, Maps as Map }
+export { init, MapActor }

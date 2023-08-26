@@ -23,6 +23,9 @@ module.exports = {
 			}
 		]
 	},
+	externals: {
+		'pixi.js': "window.PIXI"
+	},
 	plugins: [
 		new CleanWebpackPlugin()
     ]
