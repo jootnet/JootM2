@@ -24,6 +24,11 @@ class GameMap {
         this.smTilesTextureName = []
         // 地图对象层图片所在文件及索引
         this.objsTextureName = []
+	
+        // 地图对象层图片纹理
+        this.objTextureRegions = []
+        /// 对象层图片纹理的xy坐标
+        this.objTextureRegions2XY = new Map
 
         // 坐标转换一下
         for (let w = 0; w < this.width; ++w) {
@@ -41,7 +46,40 @@ class GameMap {
                 this.objsTextureName[w][h] = null
             }
         }
+
+        for (let h = 0; h < this.height; ++h) {
+            this.objTextureRegions[h] = new Set
+        }
     }
+
+    /**
+     * 添加特定地图块的对象层纹理
+     * @param {number} x 地图横坐标
+     * @param {number} y 地图纵坐标
+     * @param {PIXI.Texture} tex 对象层纹理
+     */
+    addObjTextureRegion(x, y, tex) {
+		this.objTextureRegions2XY.set(tex, [x, y])
+		this.objTextureRegions[y].add(tex)
+	}
+
+    /**
+     * 获取地图特定行对象纹理
+     * @param {number} anchorY 纹理起点纵坐标
+     * @returns 地图所有对象纹理
+     */
+    getObjsTextureRegion(anchorY) {
+		return this.objTextureRegions[anchorY]
+	}
+
+    /**
+     * 获取地图块层纹理所在块坐标
+     * @param {PIXI.Texture} tex 层纹理
+     * @returns x,y分为在第0，1个元素
+     */
+    getObjTextureRegion(tex) {
+		return this.objTextureRegions2XY.get(tex)
+	}
 }
 
 // 地图绘制类
@@ -181,7 +219,7 @@ class MapActor {
                                     gameMap.canFly[w][h] = mi.isCanFly()
                                     gameMap.canWalk[w][h] = mi.isCanWalk()
                                     if (mi.isHasBng()) {
-                                        var tileTextureName = "tiles";
+                                        let tileTextureName = "tiles";
                                         if (mi.getBngFileIdx() != 0) {
                                             tileTextureName += mi.getBngFileIdx();
                                         }
@@ -189,7 +227,7 @@ class MapActor {
                                         gameMap.tilesTextureName[w][h] = tileTextureName;
                                     }
                                     if (mi.isHasMid()) {
-                                        var smTileTextureName = "smtiles";
+                                        let smTileTextureName = "smtiles";
                                         if (mi.getMidFileIdx() != 0) {
                                             smTileTextureName += mi.getMidFileIdx();
                                         }
@@ -197,7 +235,7 @@ class MapActor {
                                         gameMap.smTilesTextureName[w][h] = smTileTextureName;
                                     }
                                     if (!mi.isHasAni() && mi.isHasObj()) {
-                                        var objTextureName = "objects";
+                                        let objTextureName = "objects";
                                         if (mi.getObjFileIdx() != 0) {
                                             objTextureName += mi.getObjFileIdx();
                                         }
@@ -288,9 +326,9 @@ class MapActor {
         }
         
         drawingX = rectPixel.x;
-        for (var w = 0; w < rectGame.width; ++w) {
+        for (let w = 0; w < rectGame.width; ++w) {
             drawingY = rectPixel.y;
-            for (var h = 0; h < rectGame.height; ++h) {
+            for (let h = 0; h < rectGame.height; ++h) {
                 const smTileTextureName = this.map.smTilesTextureName[rectGame.x + w][rectGame.y + h]
                 if (null != smTileTextureName) {
                     const tex = PIXI.utils.BaseTextureCache[smTileTextureName]
@@ -308,6 +346,46 @@ class MapActor {
                 drawingY += 32;
             }
             drawingX += 48;
+        }
+
+        for (let w = 0; w < rectGame.width; ++w) {
+            for (let h = 0; h < rectGame.height; ++h) {
+                const objTextureName = this.map.objsTextureName[rectGame.x + w][rectGame.y + h]
+                if (null != objTextureName) {
+                    const tex = PIXI.utils.BaseTextureCache[objTextureName]
+                    if (!tex) {
+                        textureLoadCompleted = false
+                        Images.load(objTextureName.split('/')[0], objTextureName.split('/')[1])
+                    } else {
+                        // 添加对象图纹理到地图对象中
+                        this.map.addObjTextureRegion(rectGame.x + w, rectGame.y + h, new PIXI.Texture(tex))
+                        // 清理纹理编号以免下次重新添加
+                        this.map.objsTextureName[rectGame.x + w][rectGame.y + h] = null
+                    }
+                }
+            }
+        }
+
+        for (let gamey = rectGame.y; gamey <= this.map.height; ++gamey) {
+            // 在同一行，人物应该把对象层踩在脚下或挡在身后
+            // 同时人物会被下一行的建筑物挡住
+            
+            // 绘制树木，建筑物等
+            const rgs = this.map.getObjsTextureRegion(gamey)
+            rgs?.forEach((k, objRegion, s) => {
+                var xy = this.map.getObjTextureRegion(objRegion)
+                if (xy[0] < rectGame.x || xy[0] > rectGame.x + rectGame.width - 1) return
+                if (xy[1] < rectGame.y || xy[1] > rectGame.y + rectGame.height - 1) return
+                drawingX = rectPixel.x + (xy[0] - rectGame.x) * 48
+                drawingY = rectPixel.y + (xy[1] - rectGame.y) * 32
+                const sprite = new PIXI.Sprite(objRegion)
+                sprite.anchor.set(0, 1)
+                sprite.x = drawingX
+                sprite.y = drawingY
+                this.bngContainer.addChild(sprite)
+            });
+            
+            // 绘制人物TODO
         }
 
         // 所有纹理都加载完了，就修改标志
