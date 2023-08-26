@@ -311,7 +311,8 @@ class MapActor {
                     const tex = PIXI.utils.BaseTextureCache[tileTextureName]
                     if (!tex) {
                         textureLoadCompleted = false
-                        Images.load(tileTextureName.split('/')[0], tileTextureName.split('/')[1])
+                        const tmpStrArr = tileTextureName.split('/')
+                        Images.load(tmpStrArr[0], tmpStrArr[1])
                     } else {
                         // 添加大地砖节点到游戏区域
                         const sprite = new PIXI.Sprite(new PIXI.Texture(tex))
@@ -334,7 +335,8 @@ class MapActor {
                     const tex = PIXI.utils.BaseTextureCache[smTileTextureName]
                     if (!tex) {
                         textureLoadCompleted = false
-                        Images.load(smTileTextureName.split('/')[0], smTileTextureName.split('/')[1])
+                        const tmpStrArr = smTileTextureName.split('/')
+                        Images.load(tmpStrArr[0], tmpStrArr[1])
                     } else {
                         // 添加小地砖节点到游戏区域
                         const sprite = new PIXI.Sprite(new PIXI.Texture(tex))
@@ -355,7 +357,8 @@ class MapActor {
                     const tex = PIXI.utils.BaseTextureCache[objTextureName]
                     if (!tex) {
                         textureLoadCompleted = false
-                        Images.load(objTextureName.split('/')[0], objTextureName.split('/')[1])
+                        const tmpStrArr = objTextureName.split('/')
+                        Images.load(tmpStrArr[0], tmpStrArr[1])
                     } else {
                         // 添加对象图纹理到地图对象中
                         this.map.addObjTextureRegion(rectGame.x + w, rectGame.y + h, new PIXI.Texture(tex))
@@ -381,7 +384,7 @@ class MapActor {
                 const sprite = new PIXI.Sprite(objRegion)
                 sprite.anchor.set(0, 1)
                 sprite.x = drawingX
-                sprite.y = drawingY
+                sprite.y = drawingY + 32
                 this.bngContainer.addChild(sprite)
             });
             

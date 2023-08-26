@@ -9,11 +9,13 @@
 
 <body>
     <p><labe for="mapNo">MapNo: </labe><input type="text" name="mapNo" inputmode="text" value="0" /> <button id="btnMapLoad">LoadMap</button></p>
+    <p><labe for="roleX">Center: </labe><input type="number" name="roleX" value="330" />,<input type="number" name="roleY" value="330" /> <button id="btnMove">SetCenter</button></p>
     <script>
         const app = new PIXI.Application({ background: '#000', width: 1024, height: 768 });
         document.body.appendChild(app.view);
 
         const btnMapLoad = document.querySelector("#btnMapLoad");
+        const btnMove = document.querySelector("#btnMove");
 
         const mapActor = new JootM2.MapActor(app, app.stage)
         btnMapLoad.onclick = (event) => {
@@ -22,6 +24,10 @@
             app.ticker.add((delta) => {
                 mapActor.update()
             })
+        }
+
+        btnMove.onclick = (event) => {
+            mapActor.setCenter(parseInt(document.querySelector("input[name='roleX']").value), parseInt(document.querySelector("input[name='roleY']").value))
         }
         
         JootM2.init("http://localhost:55842/resources.json")
