@@ -8,14 +8,16 @@
 </head>
 
 <body>
-    <p><labe for="mapNo">MapNo: </labe><input type="text" name="mapNo" inputmode="text" value="0" /> <button id="btnMapLoad">LoadMap</button></p>
-    <p><labe for="roleX">Center: </labe><input type="number" name="roleX" value="330" />,<input type="number" name="roleY" value="330" /> <button id="btnMove">SetCenter</button></p>
+    <p><label for="mapNo">MapNo: </label><input type="text" name="mapNo" inputmode="text" value="0" /> <button id="btnMapLoad">LoadMap</button><label>(At the center point after loading, click the button below to change)</label></p>
+    <p><label for="roleX">Center: </label><input type="number" name="roleX" value="330" />,<input type="number" name="roleY" value="330" /> <button id="btnMove">SetCenter</button></p>
+    <p><label for="dbgStandFlag">Stand Flags: </label><label><input type="checkbox" name="dbgStandFlag"/>(GREEN means can't stand-up, Passage and skill casting will also be affected)</label></p>
     <script>
         const app = new PIXI.Application({ background: '#000', width: 1024, height: 768 });
         document.body.appendChild(app.view);
 
         const btnMapLoad = document.querySelector("#btnMapLoad");
         const btnMove = document.querySelector("#btnMove");
+        const dbgStandFlag = document.querySelector("input[name='dbgStandFlag']");
 
         const mapActor = new JootM2.MapActor(app, app.stage)
         btnMapLoad.onclick = (event) => {
@@ -28,6 +30,10 @@
 
         btnMove.onclick = (event) => {
             mapActor.setCenter(parseInt(document.querySelector("input[name='roleX']").value), parseInt(document.querySelector("input[name='roleY']").value))
+        }
+
+        dbgStandFlag.onchange = event => {
+            mapActor.dbg.set(event.target.checked)
         }
         
         JootM2.init("http://localhost:55842/resources.json")

@@ -14,10 +14,8 @@ class GameMap {
         this.width = width
         // 地图高度
         this.height = height
-        // 地图可移动标记
-        this.canWalk = []
-        // 地图可飞跃标记
-        this.canFly = []
+        // 地图可站立标记（如不可站立，则不能途径、释放火墙以及灵符等飞行技能）
+        this.canStand = []
         // 地图块大地砖所在文件及索引
         this.tilesTextureName = []
         // 地图块小地砖所在文件及索引
@@ -32,15 +30,13 @@ class GameMap {
 
         // 坐标转换一下
         for (let w = 0; w < this.width; ++w) {
-            this.canWalk[w] = []
-            this.canFly[w] = []
+            this.canStand[w] = []
             this.tilesTextureName[w] = []
             this.smTilesTextureName[w] = []
             this.objsTextureName[w] = []
 
             for (let h = 0; h < this.height; ++h) {
-                this.canWalk[w][h] = false
-                this.canFly[w][h] = false
+                this.canStand[w][h] = false
                 this.tilesTextureName[w][h] = null
                 this.smTilesTextureName[w][h] = null
                 this.objsTextureName[w][h] = null
@@ -82,6 +78,45 @@ class GameMap {
 	}
 }
 
+// 调试信息绘制项
+class Dbg {
+
+    constructor(mapActor) {
+        this.mapActor = mapActor
+
+        this.standFlag = false
+    }
+
+    fireSettingsChange() {
+        this.mapActor.dirty = true
+    }
+
+    set(...args) {
+        do {
+            if (arguments.length == 0) break
+            if (arguments.length == 1) {
+                if (typeof arguments[0] === 'number') {
+                    this.standFlag = arguments[0] === 0
+                } else if (typeof arguments[0] === 'boolean') {
+                    this.standFlag = arguments[0]
+                } else if (typeof arguments[0] === 'object' && arguments[0] !== null) {
+                    const { standFlag } = arguments[0];
+                    if (standFlag !== undefined) {
+                        if (typeof standFlag === 'number') {
+                            this.standFlag = standFlag === 0
+                        } else if (typeof standFlag === 'boolean') {
+                            this.standFlag = standFlag
+                        } else break
+                    }
+                    else break
+                }
+                else break
+            } else break
+            this.fireSettingsChange()
+        } while (false)
+    }
+}
+
 // 地图绘制类
 class MapActor {
 
@@ -116,6 +151,10 @@ class MapActor {
         // 对象图层（树木、房屋）
         this.objContainer = new PIXI.Container
         this.container.addChild(this.objContainer)
+        // 调试层
+        this.dbgContainer = new PIXI.Container
+        this.container.addChild(this.dbgContainer)
+        this.dbg = new Dbg(this)
         
         parent.addChild(this.container)
 
@@ -198,6 +237,7 @@ class MapActor {
         this.midContainer.removeChildren()
         this.humContainer.removeChildren()
         this.objContainer.removeChildren()
+        this.dbgContainer.removeChildren()
         this.container.x = 0
         this.container.y = 0
 
@@ -216,8 +256,7 @@ class MapActor {
                             for (let w = 0; w < _map.getWidth(); ++w) {
                                 for (let h = 0; h < _map.getHeight(); ++h) {
                                     const mi = _map.getTiles()[w][h]
-                                    gameMap.canFly[w][h] = mi.isCanFly()
-                                    gameMap.canWalk[w][h] = mi.isCanWalk()
+                                    gameMap.canStand[w][h] = mi.isCanStand()
                                     if (mi.isHasBng()) {
                                         let tileTextureName = "tiles";
                                         if (mi.getBngFileIdx() != 0) {
@@ -382,6 +421,7 @@ class MapActor {
                 drawingX = rectPixel.x + (xy[0] - rectGame.x) * 48
                 drawingY = rectPixel.y + (xy[1] - rectGame.y) * 32
                 const sprite = new PIXI.Sprite(objRegion)
+                // 对象层绘制需要以下方为起点
                 sprite.anchor.set(0, 1)
                 sprite.x = drawingX
                 sprite.y = drawingY + 32
@@ -389,6 +429,28 @@ class MapActor {
             });
             
             // 绘制人物TODO
+        }
+
+        // 绘制调试信息
+        if (textureLoadCompleted) {
+            // 是否可站立的标志
+            if (this.dbg.standFlag) {
+                const graphics = new PIXI.Graphics
+                graphics.alpha = 0.4
+                drawingX = rectPixel.x;
+                for (let w = 0; w < rectGame.width; ++w) {
+                    drawingY = rectPixel.y;
+                    for (let h = 0; h < rectGame.height; ++h) {
+                        if (!this.map.canStand[rectGame.x + w][rectGame.y + h]) {
+                            graphics.lineStyle(2, 0x00ff00, 1);
+                            graphics.drawRect(drawingX + 2, drawingY + 2, 44, 28);
+                        }
+                        drawingY += 32;
+                    }
+                    drawingX += 48;
+                }
+                this.dbgContainer.addChild(graphics)
+            }
         }
 
         // 所有纹理都加载完了，就修改标志

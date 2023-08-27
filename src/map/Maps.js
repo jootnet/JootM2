@@ -64,10 +64,17 @@ class Maps {
 						mi.setObjImgIdx((obj & 0x7fff) - 1);
 						mi.setHasObj(true);
 					}
-					// 设置是否可站立
-					mi.setCanWalk((bng & 0x8000) != 0x8000 && (obj & 0x8000) != 0x8000);
-					// 设置是否可飞行
-					mi.setCanFly((obj & 0x8000) != 0x8000);
+
+					mi.setCanStand(true);
+					if ((bng & 0x8000) != 0) {
+						mi.setCanStand(false);
+					}
+					if ((mid & 0x8000) != 0) {
+						mi.setCanStand(false);
+					}
+					if ((obj & 0x8000) != 0) {
+						mi.setCanStand(false);
+					}
 
 					// 读取门索引(第7个byte)
 					let btTmp = buffer.getInt8(offset)
@@ -114,7 +121,7 @@ class Maps {
 							mi.setMidFileIdx(mi.getMidFileIdx() + 1);
 					} else if (tileByteSize > 14) {
                         offset += tileByteSize - 14
-						console.err(`${mapPath} have unkwon tileByteSize ${tileByteSize}`);
+						console.error(`${mapUrls.get(mapNo)} have unkwon tileByteSize ${tileByteSize}`);
 					}
 					if (width % 2 != 0 || height % 2 != 0)
 						mi.setHasBng(false);

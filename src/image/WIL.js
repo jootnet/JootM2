@@ -106,7 +106,7 @@ class WIL {
             const sRGBA = new Uint8Array(width * height * 4);
             if (bitCount == 8) {
                 const pixelLength = this.offsetList[no + 1] - this.offsetList[no] - 8;
-                const padding = pixelLength != width * height && pixelLength == widthBytes(8 * width) * height;
+                const padding = pixelLength != width * height && pixelLength == SDK.widthBytes(8 * width) * height;
 
                 let p_index = offset + 8;
                 const pixels = new Uint8Array(wilData);
@@ -114,7 +114,7 @@ class WIL {
                     for (let w = 0; w < width; ++w) {
                         // 跳过填充字节
                         if (padding && w == 0)
-                            p_index += skipBytes(8, width);
+                            p_index += SDK.skipBytes(8, width);
                         const pallete = SDK.Palletes[pixels[p_index++] & 0xff];
                         const _idx = (w + h * width) * 4;
                         sRGBA[_idx] = pallete[1];//r
@@ -125,14 +125,14 @@ class WIL {
                 }
             } else if (bitCount == 16) {
                 const pixelLength = this.offsetList[no + 1] - this.offsetList[no] - 8;
-                const padding = pixelLength != width * height * 2 && pixelLength == widthBytes(8 * width) * height * 2;
+                const padding = pixelLength != width * height * 2 && pixelLength == SDK.widthBytes(8 * width) * height * 2;
 
                 let p_index = offset + 8;
                 for (let h = height - 1; h >= 0; --h) {
                     for (let w = 0; w < width; ++w, p_index += 2) {
                         // 跳过填充字节
                         if (padding && w == 0)
-                            p_index += skipBytes(16, width);
+                            p_index += SDK.skipBytes(16, width);
                         const pdata = byteBuffer.getUint16(p_index, true);
                         const r = (pdata & 0xf800) >> 8;// 由于是与16位做与操作，所以多出了后面8位
                         const g = (pdata & 0x7e0) >> 3;// 多出了3位，在强转时前8位会自动丢失

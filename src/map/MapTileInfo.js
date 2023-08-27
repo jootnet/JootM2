@@ -8,7 +8,7 @@ class MapTileInfo {
         /** 是否有背景图(在热血传奇2地图中，背景图大小为4个地图块，具体到绘制地图时则表现在只有横纵坐标都为双数时才绘制) */
         this.hasBng = false;
         /** 是否可行走(站立) */
-        this.canWalk = false;
+        this.canStand = false;
         /** 补充背景图索引 */
         this.midImgIdx = 0;
         /** 是否有补充图 */
@@ -17,8 +17,6 @@ class MapTileInfo {
         this.objImgIdx = 0;
         /** 是否有对象图 */
         this.hasObj = false;
-        /** 是否可以飞越 */
-        this.canFly = false;
         /** 门索引 */
         this.doorIdx = 0;
         /** 是否有门 */
@@ -62,12 +60,12 @@ class MapTileInfo {
 		this.hasBng = hasBng;
 	}
 	/** 获取该地图块是否可以站立或走过 */
-	isCanWalk() {
-		return this.canWalk;
+	isCanStand() {
+		return this.canStand;
 	}
 	/** 设置该地图块是否可以站立或走过 */
-	setCanWalk(canWalk) {
-		this.canWalk = canWalk;
+	setCanStand(canStand) {
+		this.canStand = canStand;
 	}
 	/** 获取补充图索引 */
 	getMidImgIdx() {
@@ -100,14 +98,6 @@ class MapTileInfo {
 	/** 设置该地图块是否有对象图 */
 	setHasObj(hasObj) {
 		this.hasObj = hasObj;
-	}
-	/** 获取该地图块是否可以飞越 */
-	isCanFly() {
-		return this.canFly;
-	}
-	/** 设置该地图块是否可以飞越 */
-	setCanFly(canFly) {
-		this.canFly = canFly;
 	}
 	/** 获取门索引 */
 	getDoorIdx() {
@@ -209,7 +199,7 @@ class MapTileInfo {
 	}
 
 	/*toString() {
-		return `${this.bngImgIdx} ${this.hasBng} ${this.canWalk} ${this.midImgIdx} ${this.hasMid} ${this.objImgIdx} ${this.hasObj} ${this.canFly} ${this.doorIdx} ${this.hasDoor} ${this.doorOffset} ${this.doorCanOpen} ${this.aniFrame} ${this.aniBlendMode} ${this.hasAni} ${this.aniTick} ${this.objFileIdx} ${this.bngFileIdx} ${this.midFileIdx} ${this.light}`
+		return `${this.bngImgIdx} ${this.hasBng} ${this.canStand} ${this.midImgIdx} ${this.hasMid} ${this.objImgIdx} ${this.hasObj} ${this.doorIdx} ${this.hasDoor} ${this.doorOffset} ${this.doorCanOpen} ${this.aniFrame} ${this.aniBlendMode} ${this.hasAni} ${this.aniTick} ${this.objFileIdx} ${this.bngFileIdx} ${this.midFileIdx} ${this.light}`
 	}*/
 }
 
